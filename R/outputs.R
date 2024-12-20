@@ -63,10 +63,10 @@ parse_fuzz_result_concat <- function(fr, delim) {
     if (is.null(elem)) {
       return(NA_character_)
     } else {
-      paste(elem, collapse = delim)
+      gsub(pattern = "\n", replacement = " ", x = paste(elem, collapse = delim))
     }
   }
-
+  
   dfr[["output"]] <- elem_collapse(fr[["test_result"]][["output"]])
   dfr[["messages"]] <- elem_collapse(fr[["test_result"]][["messages"]])
   dfr[["warnings"]] <- elem_collapse(fr[["test_result"]][["warnings"]])
