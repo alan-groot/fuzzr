@@ -39,7 +39,6 @@
 #' # When evaluating a function that takes ..., set check_args to FALSE
 #' fr <- fuzz_function(paste, "x", check_args = FALSE)
 fuzz_function <- function(fun, arg_name, ..., tests = test_all(), check_args = TRUE, progress = interactive()) {
-  #  browser()
   fuzz_asserts(fun, check_args, progress)
   attr(fun, "fun_name") <- deparse(substitute(fun))
   assertthat::assert_that(is_named_l(tests))
@@ -48,7 +47,7 @@ fuzz_function <- function(fun, arg_name, ..., tests = test_all(), check_args = T
   # keeping only those passed in as ... These will be used in the named list
   # passed to p_fuzz_function
   dots_call_names <- purrr::map_chr(as.list(match.call()), deparse)
-  if (rlang::is_named(list(...))) {
+  if (!is.null(names(list(...)))) {
     .dots <- list(...)
     dots_call_names <- dots_call_names[names(.dots)]
   } else {
@@ -103,83 +102,18 @@ fuzz_function_call <- function(quoted_call, tests = test_all(), check_args = TRU
   arg_names <- if (!is.null(names(parameters))) {
     names(parameters)
   } else {
-    rlang::fn_fmls_names(fun)
+    names(formals(fun))
   }
   result <- lapply(arg_names, function(arg_name) {
-    #    browser()
-    # does not work
-    #        do.call(fuzz_function, args = list(
-    #                fun = fun, arg_name = arg_name, tests = tests,
-    #                check_args = check_args, progress = progress,
-    #                as.pairlist(parameters[
-    #                    which(arg_names != arg_name)
-    #                ])))
-    # does not work
-    #    do.call(fuzz_function, args = list(
-    #            fun = fun, arg_name = arg_name, tests = tests,
-    #            check_args = check_args, progress = progress,
-    #            rlang::inject(parameters[
-    #                    which(arg_names != arg_name)
-    #                ])))
-    # does not work
-    #    do.call(fuzz_function, args = list(
-    #            fun = fun, arg_name = arg_name, tests = tests,
-    #            check_args = check_args, progress = progress,
-    #            rlang::ensyms(as.pairlist(parameters[
-    #                    which(arg_names != arg_name)
-    #                ]))))
-    #    browser()
-
-    # works!
-    # browser()
-    #    fuzz_function(
-    #      fun = fun, arg_name = arg_name, rlang::inject(parameters[which(arg_names != arg_name)]), tests = tests, check_args = check_args,
-    #      progress = progress
-    #    )
-
-    # does not work
-    #        fuzz_function(
-    #          fun = fun, arg_name = arg_name, {{ parameters[which(arg_names != arg_name)] }}, tests = tests, check_args = check_args,
-    #          progress = progress
-    #        )
-    # does not work
-    #        fuzz_function(
-    #          fun = fun, arg_name = arg_name, rlang::englue("{{ parameters[ which(arg_names != arg_name) ] }}"), tests = tests, check_args = check_args,
-    #          progress = progress
-    #        )
-    # does not work
-    #        fuzz_function(
-    #          fun = fun, arg_name = arg_name, !!rlang::syms(parameters[which(arg_names != arg_name)]), tests = tests, check_args = check_args,
-    #          progress = progress
-    #        )
-
-    # works!
-    #        fuzz_function(
-    #          fun = fun, arg_name = arg_name, unlist(as.list(parameters[which(arg_names != arg_name)])), tests = tests, check_args = check_args,
-    #          progress = progress
-    #        )
-    # ----------------
-    # works
-    #        fuzz_function(
-    #          fun = fun, arg_name = arg_name, as.pairlist(parameters[
-    #            which(arg_names != arg_name)
-    #          ]), tests = tests, check_args = check_args,
-    #          progress = progress
-    #        )
-    # works!
-    #    fuzz_function(
-    #      fun = fun, arg_name = arg_name, parameters[
-    #        which(arg_names != arg_name)
-    #      ], tests = tests, check_args = check_args,
-    #      progress = progress
-    #    )
+    fuzz_function(
+      fun = fun, arg_name = arg_name, parameters[
+        which(arg_names != arg_name)
+      ], tests = tests, check_args = check_args,
+      progress = progress
+    )
   })
-  #    do.call(rbind, )
   result <- do.call(c, result)
-  class(result) <- c("fuzz_results", class(result))
-  result
-
-  #    browser()
+  structure(result, class = "fuzz_results")
 }
 
 #' @rdname fuzz_function
@@ -380,8 +314,6 @@ try_fuzz <- function(fun, fun_name, all_args) {
     },
     type = "output"
   )
-
-  #  browser()
 
   if (length(output) == 0) {
     output <- NULL
