@@ -41,6 +41,9 @@ pass arguments to a function that accepts arguments via \code{...}.}
 
 \item{progress}{Show a progress bar while running tests?}
 
+\item{quoted_call}{A quoted function call. The parameters that are present
+in this call are fuzz tested using \code{tests}.}
+
 \item{.l}{A named list of tests.}
 }
 \value{
@@ -71,7 +74,6 @@ fr <- fuzz_function(paste, "x", check_args = FALSE)
 fr <- fuzz_function_call(quote(identity(x = 1)))
 knitr::kable(as.data.frame(fr))
 
-fuzz_function(identical, arg_name = "x", y = TRUE)
 fr2 <- fuzz_function_call(quote(identical(x = TRUE, y = FALSE)))
 knitr::kable(as.data.frame(fr2))
 

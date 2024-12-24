@@ -78,12 +78,13 @@ fuzz_function <- function(fun, arg_name, ..., tests = test_all(), check_args = T
 }
 
 #' @rdname fuzz_function
+#' @param quoted_call A quoted function call. The parameters that are present
+#' in this call are fuzz tested using `tests`.
 #' @export
 #' @examples
 #' fr <- fuzz_function_call(quote(identity(x = 1)))
 #' knitr::kable(as.data.frame(fr))
 #'
-#' fuzz_function(identical, arg_name = "x", y = TRUE)
 #' fr2 <- fuzz_function_call(quote(identical(x = TRUE, y = FALSE)))
 #' knitr::kable(as.data.frame(fr2))
 #'
@@ -92,6 +93,7 @@ fuzz_function <- function(fun, arg_name, ..., tests = test_all(), check_args = T
 #'
 #' fr4 <- fuzz_function_call(quote(dirname(path = ".")))
 #' knitr::kable(as.data.frame(fr4))
+#' @md
 fuzz_function_call <- function(quoted_call, tests = test_all(), check_args = TRUE, progress = interactive()) {
   error <- purrr::safely(eval)(quoted_call)$error
   if (!is.null(error)) {
