@@ -79,7 +79,7 @@ fuzz_function <- function(fun, arg_name, ..., tests = test_all(), check_args = T
 
 #' @rdname fuzz_function
 #' @param quoted_call A quoted function call. The parameters that are present
-#' in this call are fuzz tested using `tests`.
+#' in this call are fuzz tested separately using `tests`.
 #' @export
 #' @examples
 #' fr <- fuzz_function_call(quote(identity(x = 1)))

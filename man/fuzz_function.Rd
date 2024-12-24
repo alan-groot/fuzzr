@@ -42,7 +42,7 @@ pass arguments to a function that accepts arguments via \code{...}.}
 \item{progress}{Show a progress bar while running tests?}
 
 \item{quoted_call}{A quoted function call. The parameters that are present
-in this call are fuzz tested using \code{tests}.}
+in this call are fuzz tested separately using \code{tests}.}
 
 \item{.l}{A named list of tests.}
 }
