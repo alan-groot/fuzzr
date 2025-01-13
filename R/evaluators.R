@@ -40,7 +40,6 @@
 #' fr <- fuzz_function(paste, "x", check_args = FALSE)
 fuzz_function <- function(fun, arg_name, ..., tests = test_all(), check_args = TRUE, progress = interactive()) {
   fuzz_asserts(fun, check_args, progress)
-  attr(fun, "fun_name") <- deparse(substitute(fun))
   assertthat::assert_that(is_named_l(tests))
 
   # Collect the unevaluated names of variables passed to the original call,
@@ -100,6 +99,7 @@ fuzz_function_call <- function(quoted_call, tests = test_all(), check_args = TRU
     stop("`quoted_call` could not be evaluated without errors: ", error)
   }
   fun <- get(as.list(quoted_call)[[1]])
+  attr(fun, "fun_name") <- as.character(as.list(quoted_call)[[1]])
   parameters <- as.list(quoted_call)[-1]
   arg_names <- if (!is.null(names(parameters))) {
     names(parameters)
@@ -210,6 +210,8 @@ p_fuzz_function <- function(fun, .l, check_args = TRUE, progress = interactive()
     }
   )
 
+  lastFuzzTest$results <- fr
+  
   structure(fr, class = "fuzz_results")
 }
 
