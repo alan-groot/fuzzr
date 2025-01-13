@@ -19,7 +19,7 @@ fuzzr implements some simple ["fuzz tests"](https://en.wikipedia.org/wiki/Fuzz_t
 ## Installation
 
 ```{r, eval = FALSE, purl = FALSE}
-# install the development version from here
+# install the development version from here 
 devtools::install_github("alan-groot/fuzzr")
 ```
 
