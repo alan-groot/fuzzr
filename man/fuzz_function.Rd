@@ -16,7 +16,7 @@ fuzz_function(
 )
 
 fuzz_function_call(
-  quoted_call,
+  function_call,
   tests = test_all(),
   check_args = TRUE,
   progress = interactive()
@@ -41,8 +41,8 @@ pass arguments to a function that accepts arguments via \code{...}.}
 
 \item{progress}{Show a progress bar while running tests?}
 
-\item{quoted_call}{A quoted function call. The parameters that are present
-in this call are fuzz tested separately using \code{tests}.}
+\item{function_call}{A (quoted) function call. The parameters that are
+present in this call are fuzz tested separately using \code{tests}.}
 
 \item{.l}{A named list of tests.}
 }
@@ -72,6 +72,8 @@ fr <- fuzz_function(lm, "formula", data = iris)
 # When evaluating a function that takes ..., set check_args to FALSE
 fr <- fuzz_function(paste, "x", check_args = FALSE)
 fr <- fuzz_function_call(quote(identity(x = 1)))
+fr_unquoted <- fuzz_function_call(quote(identity(x = 1)))
+stopifnot(identical(fr, fr_unquoted))
 knitr::kable(as.data.frame(fr))
 
 fr2 <- fuzz_function_call(quote(identical(x = TRUE, y = FALSE)))
@@ -80,7 +82,7 @@ knitr::kable(as.data.frame(fr2))
 fr3 <- fuzz_function_call(quote(dirname(".")))
 knitr::kable(as.data.frame(fr3))
 
-fr4 <- fuzz_function_call(quote(dirname(path = ".")))
+fr4 <- fuzz_function_call(dirname(path = "."))
 knitr::kable(as.data.frame(fr4))
 
 # Pass tests to multiple arguments via a named list

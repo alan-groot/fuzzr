@@ -78,11 +78,13 @@ fuzz_function <- function(fun, arg_name, ..., tests = test_all(), check_args = T
 }
 
 #' @rdname fuzz_function
-#' @param quoted_call A quoted function call. The parameters that are present
-#' in this call are fuzz tested separately using `tests`.
+#' @param function_call A (quoted) function call. The parameters that are 
+#' present in this call are fuzz tested separately using `tests`.
 #' @export
 #' @examples
 #' fr <- fuzz_function_call(quote(identity(x = 1)))
+#' fr_unquoted <- fuzz_function_call(quote(identity(x = 1)))
+#' stopifnot(identical(fr, fr_unquoted))
 #' knitr::kable(as.data.frame(fr))
 #'
 #' fr2 <- fuzz_function_call(quote(identical(x = TRUE, y = FALSE)))
@@ -91,13 +93,18 @@ fuzz_function <- function(fun, arg_name, ..., tests = test_all(), check_args = T
 #' fr3 <- fuzz_function_call(quote(dirname(".")))
 #' knitr::kable(as.data.frame(fr3))
 #'
-#' fr4 <- fuzz_function_call(quote(dirname(path = ".")))
+#' fr4 <- fuzz_function_call(dirname(path = "."))
 #' knitr::kable(as.data.frame(fr4))
 #' @md
-fuzz_function_call <- function(quoted_call, tests = test_all(), check_args = TRUE, progress = interactive()) {
+fuzz_function_call <- function(function_call, tests = test_all(), check_args = TRUE, progress = interactive()) {
+  quoted_call <- if (is.language(function_call)) {
+    function_call
+  } else {
+    substitute(function_call)
+  }
   error <- purrr::safely(eval)(quoted_call)$error
   if (!is.null(error)) {
-    stop("`quoted_call` could not be evaluated without errors: ", error)
+    stop("`function_call` could not be evaluated without errors: ", error)
   }
   fun <- get(as.list(quoted_call)[[1]])
   parameters <- as.list(quoted_call)[-1]

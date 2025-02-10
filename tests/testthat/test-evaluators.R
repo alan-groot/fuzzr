@@ -10,4 +10,7 @@ test_that("snapshot tests from example", {
   
   fr4 <- fuzz_function_call(quote(dirname(path = ".")))
   expect_snapshot(as.data.frame(fr4))
+
+  fr5 <- fuzz_function_call(dirname(path = "."))
+  expect_identical(fr5, fr4)
 })
